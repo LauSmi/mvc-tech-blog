@@ -1,15 +1,23 @@
+const seedUsers = require('./userSeeds');
+const seedPosts = require('./postSeeds');
+const seedComments = require('./commentSeeds');
+
 const sequelize = require('../config/connection');
-const seedGallery = require('./galleryData');
-const seedPaintings = require('./paintingData');
 
 const seedAll = async () => {
   await sequelize.sync({ force: true });
+  console.log('\n----- DATABASE SYNCED -----\n');
+  await seedUsers();
+  console.log('\n----- USERS SEEDED -----\n');
 
-  await seedGallery();
+  await seedPosts();
+  console.log('\n----- POSTS SEEDED -----\n');
 
-  await seedPaintings();
+  await seedComments();
+  console.log('\n----- COMMENTS SEEDED -----\n');
 
   process.exit(0);
 };
 
 seedAll();
+
