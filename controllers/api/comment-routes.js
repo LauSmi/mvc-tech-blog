@@ -1,60 +1,62 @@
 const router = require('express').Router();
-// Comment model
 const { Comment } = require('../../models');
-// Authorization Helper
 const withAuth = require('../../utils/auth');
 
-// Routes
 
-// Get comments
-router.get('/', (req, res) => {
-    // Access the Comment model and run .findAll() method to get all comments
-    Comment.findAll()
-        // return the data as JSON formatted
-        .then(dbCommentData => res.json(dbCommentData))
-        // if there is a server error, return that error
-        .catch(err => {
-            console.log(err);
-            res.status(500).json(err);
-        });
-});
-
-// Post a new comment
-router.post('/', withAuth, (req, res) => {
-    // check the session, and if it exists, create a comment
-    if (req.session) {
-        Comment.create({
-            comment_text: req.body.comment_text,
-            post_id: req.body.post_id,
-            // use the user id from the session
-            user_id: req.session.user_id
-        })
-            .then(dbCommentData => res.json(dbCommentData))
-            .catch(err => {
-                console.log(err);
-                res.status(400).json(err);
-            });
+//get all
+router.get('/', async (req, res) => {
+    try {
+        const commentDb = await Comment.findAll()
+        res.json(commentDb)
+    } catch (err) {
+        console.log(err);
+        res.status(500).json(err);
     }
 });
 
-// Delete a comment
-router.delete('/:id', withAuth, (req, res) => {
-    Comment.destroy({
-        where: {
-            id: req.params.id
+//new comment
+router.post('/', withAuth, async (req, res) => {
+    try {
+        const { comment_text, post_id } = req.body;
+        if (!comment_text || !post_id) {
+            res.status(400).json({ message: 'Missing comment_text or post_id' });
+            return;
         }
-    })
-        .then(dbCommentData => {
-            if (!dbCommentData) {
-                res.status(404).json({ message: 'No comment found with this id' });
-                return;
-            }
-            res.json(dbCommentData);
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json(err);
+
+        const newComment = await Comment.create({
+            comment_text: comment_text,
+            user_id: req.session.user_id,
+            post_id: post_id
         });
+
+        res.json(newComment);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json(err);
+    }
+});
+
+
+
+router.delete('/:id', withAuth, async (req, res) => {
+    try {
+        const comment = await Comment.destroy({
+            where: {
+                id: req.params.id,
+                user_id: req.session.user_id
+            },
+        });
+
+        if (!comment) {
+            res.status(404).json({ message: 'Sorry, the comment could not be found or you are not authorized to delete it.' });
+            return;
+        }
+
+        res.json({ message: 'Comment deleted successfully.' });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json(err);
+    }
 });
 
 module.exports = router;
