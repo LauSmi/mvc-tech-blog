@@ -1,43 +1,43 @@
 const { Model, DataTypes } = require('sequelize');
-const bcrypt = require('bcrypt');
 const sequelize = require('../config/connection');
 
-// create Post model
 class Post extends Model {}
 
-// Post model
 Post.init(
   {
     id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     title: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      defaultValue: 'untitled'
     },
     post_text: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
-      validate: {
-        len: [1]
-      }
+      defaultValue: 'post text here'
     },
     user_id: {
       type: DataTypes.INTEGER,
+      allowNull: false,
       references: {
         model: 'user',
-        key: 'id'
+        key: 'id',
       }
+    }, 
+    created_at: {
+      type: DataTypes.DATE,
     }
   },
   {
     sequelize,
     freezeTableName: true,
     underscored: true,
-    modelName: 'post'
+    modelName: 'post',
   }
 );
 

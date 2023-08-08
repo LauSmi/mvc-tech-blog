@@ -1,5 +1,5 @@
-const router = require('express').Router();
-const sequelize = require('../config/connection');
+const express = require('express');
+const router = express.Router(); // Create an instance of Router
 const { Post, User, Comment } = require('../models');
 const withAuth = require('../utils/auth');
 

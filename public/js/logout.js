@@ -1,14 +1,20 @@
-const logout = async () => {
-  const response = await fetch('/api/users/logout', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-  });
+async function logoutHandler(e) {
+    e.preventDefault();
 
-  if (response.ok) {
-    document.location.replace('/');
-  } else {
-    alert('Failed to log out.');
-  }
-};
+    const input = await fetch('/api/user/logout', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json' 
+        },
+    });
 
-document.querySelector('#logout').addEventListener('click', logout);
+    if(input.ok){
+        document.location.replace('/');
+    } else {
+        alert(input.statusText);
+    }
+}
+
+document
+.querySelector('#logout')
+.addEventListener('click', logoutHandler);
